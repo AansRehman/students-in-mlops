@@ -1,0 +1,41 @@
+pipeline {
+    agent any
+    
+    stages {
+        stage('Cloning repository') {
+            steps {
+                // Checkout the repository using git
+                git 'https://github.com/AansRehman/students-in-mlops.git'
+            }
+        }
+        
+        stage('Installation of dependencies') {
+            steps {
+                // Assuming you're using pip for Python dependencies
+                bat 'pip install -r requirements.txt'
+            }
+        }
+        
+        stage('Execution of test.py') {
+            steps {
+                // Execute your test.py script
+                bat 'python test.py'
+            }
+        }
+        
+        stage('Deploying step') {
+            steps {
+                script {
+                    def branchName = bat(script: 'git rev-parse --abbrev-ref HEAD', returnStdout: true).trim()
+                    if (branchName == 'main') {
+                        echo 'Deploying to production'
+                        // Add your production deployment steps here
+                    } else {
+                        echo 'Deploying to UAT'
+                        // Add your UAT deployment steps here
+                    }
+                }
+            }
+        }
+    }
+}
